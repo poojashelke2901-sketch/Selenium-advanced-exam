@@ -1,3 +1,27 @@
+
+# Selenium Advanced Assignment
+
+## Tech Stack
+- Java
+- Selenium 4
+- TestNG
+
+## Features
+- Explicit Wait (20 sec)
+- Scroll using JS
+- Window Handling
+- Assertions
+- Screenshot capture
+- Multiple locators
+
+## Execution
+Run using testng.xml
+
+## Notes
+- Chrome browser used
+- All test scenarios covered
+
+========================
 # Selenium Advanced Assignment
 
 ## Project Description
@@ -29,7 +53,7 @@ pom.xml → Dependencies---
 
 ## Test Scenario Covered
 
-1. Navigate to https://www.testmuial.com  
+1. Navigate to https://www.testmuai.com
 2. Apply explicit wait  
 3. Scroll to "Explore Agentic Clouds"  
 4. Click and verify new tab  
@@ -58,6 +82,9 @@ Screenshots are captured at important steps and stored in `screenshots` folder.
 - Parallel Execution: Enabled  
 
 ---
+
+ GitHub Repository URL - https://github.com/poojashelke2901-sketch/Selenium-advanced-exam.git
+-----
 
 ## Author
 Pooja Shelke
