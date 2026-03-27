@@ -5,8 +5,8 @@
     <classes>
       <class name="tests.SeleniumAdvancedExam">
         <methods>
-          <include name="setup"/>
           <include name="testScenario"/>
+          <include name="setup"/>
         </methods>
       </class> <!-- tests.SeleniumAdvancedExam -->
     </classes>

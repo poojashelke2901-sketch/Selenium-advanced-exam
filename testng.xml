@@ -1,10 +1,21 @@
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-
-<suite name="Suite" parallel="classes" thread-count="2">
+<suite name="TestMu Suite" parallel="classes" thread-count="2">
 
     <test name="Chrome Test">
+        <parameter name="browser" value="chrome"/>
+        <parameter name="platform" value="Windows 10"/>
+        <parameter name="version" value="128.0"/>
         <classes>
-            <class name="tests.SeleniumAdvancedTest"/>
+            <class name="tests.SeleniumAdvancedExam"/>
+        </classes>
+    </test>
+
+    <test name="Edge Test">
+        <parameter name="browser" value="edge"/>
+        <parameter name="platform" value="macOS Ventura"/>
+        <parameter name="version" value="127.0"/>
+        <classes>
+            <class name="tests.SeleniumAdvancedExam"/>
         </classes>
     </test>
 

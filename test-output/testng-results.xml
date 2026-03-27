@@ -2,16 +2,33 @@
 <testng-results ignored="0" total="1" passed="1" failed="0" skipped="0">
   <reporter-output>
   </reporter-output>
-  <suite started-at="2026-03-26T09:37:29 PDT" name="Default suite" finished-at="2026-03-26T09:38:02 PDT" duration-ms="32802">
+  <suite started-at="2026-03-27T01:04:05 PDT" name="Default suite" finished-at="2026-03-27T01:04:47 PDT" duration-ms="41893">
     <groups>
     </groups>
-    <test started-at="2026-03-26T09:37:29 PDT" name="Default test" finished-at="2026-03-26T09:38:02 PDT" duration-ms="32802">
+    <test started-at="2026-03-27T01:04:05 PDT" name="Default test" finished-at="2026-03-27T01:04:47 PDT" duration-ms="41893">
       <class name="tests.SeleniumAdvancedExam">
-        <test-method is-config="true" signature="setup()[pri:0, instance:tests.SeleniumAdvancedExam@217ed35e]" started-at="2026-03-26T09:37:29 PDT" name="setup" finished-at="2026-03-26T09:37:34 PDT" duration-ms="5326" status="PASS">
+        <test-method is-config="true" signature="setup(java.lang.String,java.lang.String,java.lang.String)[pri:0, instance:tests.SeleniumAdvancedExam@198b6731]" started-at="2026-03-27T01:04:05 PDT" name="setup" finished-at="2026-03-27T01:04:18 PDT" duration-ms="13367" status="PASS">
+          <params>
+            <param index="0">
+              <value>
+                <![CDATA[chrome]]>
+              </value>
+            </param>
+            <param index="1">
+              <value>
+                <![CDATA[Windows 10]]>
+              </value>
+            </param>
+            <param index="2">
+              <value>
+                <![CDATA[128.0]]>
+              </value>
+            </param>
+          </params>
           <reporter-output>
           </reporter-output>
         </test-method> <!-- setup -->
-        <test-method signature="testScenario()[pri:0, instance:tests.SeleniumAdvancedExam@217ed35e]" started-at="2026-03-26T09:37:35 PDT" name="testScenario" finished-at="2026-03-26T09:38:02 PDT" duration-ms="27353" status="PASS">
+        <test-method signature="testScenario()[pri:0, instance:tests.SeleniumAdvancedExam@198b6731]" started-at="2026-03-27T01:04:18 PDT" name="testScenario" finished-at="2026-03-27T01:04:47 PDT" duration-ms="28444" status="PASS">
           <reporter-output>
           </reporter-output>
         </test-method> <!-- testScenario -->

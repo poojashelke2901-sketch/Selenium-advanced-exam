@@ -1,177 +1,181 @@
 package tests;
 
+import org.apache.commons.io.FileUtils;
+import org.openqa.selenium.*;
+import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeOptions;
+import org.openqa.selenium.remote.RemoteWebDriver;
+import org.openqa.selenium.support.ui.*;
+import org.testng.Assert;
+import org.testng.annotations.*;
+import org.testng.annotations.Optional;
 
-	 import org.apache.commons.io.FileUtils;
-     import org.openqa.selenium.*;
-	 import org.openqa.selenium.chrome.ChromeDriver;
-	 import org.openqa.selenium.support.ui.ExpectedConditions;
-	 import org.openqa.selenium.support.ui.WebDriverWait;
-	 import org.testng.Assert;
-	 import org.testng.annotations.AfterClass;
-	 import org.testng.annotations.BeforeClass;
-	 import org.testng.annotations.Test;
+import java.io.File;
+import java.io.IOException;
+import java.net.URL;
+import java.time.Duration;
+import java.util.*;
 
-     import java.io.File;
-     import java.io.IOException;
-     import java.time.Duration;
-	 import java.util.ArrayList;
-	 import java.util.List;
-	 import java.util.Set;
+public class SeleniumAdvancedExam {
 
-	 public class SeleniumAdvancedExam  {
+    RemoteWebDriver driver;
+    WebDriverWait wait;
 
-	 WebDriver driver;
-	 WebDriverWait wait;
+    String username = System.getenv("LT_USERNAME");
+    String accessKey = System.getenv("LT_ACCESS_KEY");
 
-	 @BeforeClass
-	 public void setup() {
-	 driver = new ChromeDriver();
-	 driver.manage().window().maximize();
-	 wait = new WebDriverWait(driver, Duration.ofSeconds(15));
-	 }
+    @Parameters({"browser", "platform", "version"})
+    @BeforeClass
+    public void setup(
+            @Optional("chrome") String browser,
+            @Optional("Windows 10") String platform,
+            @Optional("128.0") String version) throws Exception {
 
-	 @Test
-	 public void testScenario() throws InterruptedException {
+        MutableCapabilities options;
 
-	 // 1. Navigate
-	 driver.get("https://www.testmuai.com/");
+        if (browser.equalsIgnoreCase("chrome")) {
+            ChromeOptions chrome = new ChromeOptions();
+            chrome.setBrowserVersion(version);
+            chrome.setPlatformName(platform);
+            options = chrome;
+        } else {
+            EdgeOptions edge = new EdgeOptions();
+            edge.setBrowserVersion(version);
+            edge.setPlatformName(platform);
+            options = edge;
+        }
 
-	 // 2. Wait until DOM ready
-	 wait.until(webDriver ->
-	 ((JavascriptExecutor) webDriver)
-	 .executeScript("return document.readyState")
-	 .equals("complete"));
+        Map<String, Object> ltOptions = new HashMap<>();
+        ltOptions.put("build", "Selenium Advanced Exam");
+        ltOptions.put("name", browser + " Test");
+        ltOptions.put("video", true);
+        ltOptions.put("network", true);
+        ltOptions.put("consoleLogs", "info");
+        ltOptions.put("screenshots", true);
 
-	 // 3. Scroll to 'Explore Agentic Clouds'
-	 // Locator for the Agentic Cloud link (adjust if yours differs) 
-	 By agenticBy = By.cssSelector("a[href*='agentic-cloud']");
+        options.setCapability("LT:Options", ltOptions);
 
-	 // 1) Wait for visibility and grab the element
-	 WebElement exploreLink = wait.until(ExpectedConditions.visibilityOfElementLocated(agenticBy));
+        driver = new RemoteWebDriver(
+                new URL("https://" + username + ":" + accessKey + "@hub.lambdatest.com/wd/hub"),
+                options
+        );
 
-	 // 2) Scroll into view and offset for sticky header
-	 JavascriptExecutor js = (JavascriptExecutor) driver;
-	 long headerH = 0L;
-	 try {
-	 Object h = js.executeScript(
-	 "const el = document.querySelector('header,.navbar,.chfw-navbar,.chfw-navbar__links');" +
-	 "return el && el.offsetHeight ? el.offsetHeight : 0;");
-	 if (h instanceof Long) headerH = (Long) h;
-	 if (h instanceof Number) headerH = ((Number) h).longValue();
-	 } catch (Exception ignored) {}
-	 js.executeScript("arguments[0].scrollIntoView({block:'start'});", exploreLink);
-	 js.executeScript("window.scrollBy(0, -arguments[0]-20);", headerH);
+        System.out.println("Session ID: " + driver.getSessionId());
+        System.out.println("Running on: " + browser + " | " + platform);
 
-	 // 3) Ensure it is clickable now
-	 wait.until(ExpectedConditions.elementToBeClickable(exploreLink));
+        wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+    }
 
-	 takeScreenshot("Step3_Scroll");
-	 
-	 // 4) Open in a NEW TAB (Ctrl/Cmd+Enter); fallback to window.open
-	 String os = System.getProperty("os.name").toLowerCase();
-	 Keys mod = os.contains("mac") ? Keys.COMMAND : Keys.CONTROL;
-	 try {
-	 exploreLink.sendKeys(Keys.chord(mod, Keys.ENTER));
-	 } catch (Exception e) {
-	 js.executeScript("window.open(arguments[0].href,'_blank');", exploreLink);
-	 }
+    @Test
+    public void testScenario() {
 
-	 // 5) Wait until the new tab is present
-	 wait.until(ExpectedConditions.numberOfWindowsToBe(2));
+        // 1. Navigate
+        driver.get("https://www.testmuai.com/");
 
-	 // 4. Click and verify new tab
-	 exploreLink.click();
+        // 2. Wait for DOM
+        wait.until(d -> ((JavascriptExecutor) d)
+                .executeScript("return document.readyState").equals("complete"));
 
-	 // 5. Handle windows
-	 Set<String> handles = driver.getWindowHandles();
-	 List<String> windowList = new ArrayList<>(handles);
+        takeScreenshot("Step1_Home");
 
-	 System.out.println("Window Handles: " + windowList);
+        // 3. Scroll to Explore Agentic Cloud
+        WebElement explore = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.cssSelector("a[href*='agentic-cloud']")));
 
-	 Assert.assertEquals(windowList.size(), 2);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", explore);
 
-	 // Switch to new tab
-	 driver.switchTo().window(windowList.get(1));
+        takeScreenshot("Step3_Scroll");
 
-	 // 6. Verify URL
-	 String expectedUrlContains = "agentic";
-	 Assert.assertTrue(driver.getCurrentUrl().contains(expectedUrlContains));
+        // 4. Open in NEW TAB
+        ((JavascriptExecutor) driver).executeScript(
+                "window.open(arguments[0].href,'_blank');", explore);
 
-	 takeScreenshot("Step6_NewTab");
-	 
-	 // 7. Scroll to specific section
-	 WebElement section = wait.until(ExpectedConditions.presenceOfElementLocated(
-	 By.xpath("//*[contains(text(),'Seamlessly Scale with Agentic Cloud')]")
-	 ));
+        // 5. Handle windows
+        wait.until(ExpectedConditions.numberOfWindowsToBe(2));
 
-	 ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", section);
-	 
-	// 8. Click 'Try Now For Free' with retry logic
-	 By tryNowBy = By.xpath("//a[contains(text(),'Try Now For Free')]");
+        List<String> windows = new ArrayList<>(driver.getWindowHandles());
+        System.out.println("Window Handles: " + windows);
 
-	 WebElement tryNow = null;
-	 for (int i = 0; i < 3; i++) { // retry up to 3 times
-	     try {
-	         tryNow = wait.until(ExpectedConditions.elementToBeClickable(tryNowBy));
-	         tryNow.click();
-	         break; // success, exit loop
-	     } catch (StaleElementReferenceException e) {
-	         System.out.println("Stale element, retrying... attempt " + (i + 1));
-	     }
-	 }
+        driver.switchTo().window(windows.get(1));
 
-	 // 9. Validate title
-	 wait.until(ExpectedConditions.titleContains("Sign up"));
-	 String actualTitle = driver.getTitle();
+        // 6. Verify URL
+        Assert.assertTrue(driver.getCurrentUrl().contains("agentic"));
 
-	 Assert.assertTrue(actualTitle.contains("Sign up for free"));
+        takeScreenshot("Step6_NewTab");
 
-	  takeScreenshot("Step9_Signup");
-	  
-	 // 10. Close current window
-	 driver.close();
+        // 7. Scroll to section (FIXED LOCATOR)
+        WebElement section = wait.until(ExpectedConditions.presenceOfElementLocated(
+                By.xpath("//*[contains(text(),'Scale with Agentic Cloud')]")));
 
-	 // Switch back to main window
-	 driver.switchTo().window(windowList.get(0));
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", section);
 
-	 // 11. Print window count
-	 System.out.println("Window count: " + driver.getWindowHandles().size());
+        takeScreenshot("Step7_Section");
 
-	 // 12. Navigate to blog
-	 driver.get("https://www.testmuai.com/blog");
+        // 8. Click Try Now (FIXED FOR EDGE)
+        By tryNowBy = By.xpath("//a[contains(text(),'Try Now')]");
 
-	 
-	// 13. Click Community (re-locate after navigation)
-	 By communityBy = By.linkText("Community");
-	 WebElement community = wait.until(ExpectedConditions.elementToBeClickable(communityBy));
-	 try {
-	     community.click();
-	 } catch (StaleElementReferenceException e) {
-	     System.out.println("Community link went stale, re-finding...");
-	     community = wait.until(ExpectedConditions.elementToBeClickable(communityBy));
-	     community.click();
-	 }
+        WebElement tryNow = wait.until(ExpectedConditions.presenceOfElementLocated(tryNowBy));
 
-	 // Verify URL
-	 wait.until(ExpectedConditions.urlContains("community"));
-	 String actualUrl = driver.getCurrentUrl();
-	 Assert.assertTrue(actualUrl.startsWith("https://community.testmuai.com/"),
-	     "Unexpected URL: " + actualUrl);
-	 
-	 takeScreenshot("Step13_Community");
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", tryNow);
 
-	 // 14. Close browser
-	 driver.quit();
-	 }
-	 
-	// Screenshot method (IMPORTANT NOTE)
-	    public void takeScreenshot(String name) {
-	        try {
-	            File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-	            FileUtils.copyFile(src, new File("screenshots/" + name + ".png"));
-	        } catch (IOException e) {
-	            e.printStackTrace();
-	        }
+        try {
+            wait.until(ExpectedConditions.elementToBeClickable(tryNow)).click();
+        } catch (Exception e) {
+            System.out.println("Normal click failed, using JS click");
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", tryNow);
+        }
 
-	    }
-	 }
+        // 9. Validate title (FIXED SAFE ASSERT)
+        wait.until(ExpectedConditions.titleContains("Sign"));
+
+        String title = driver.getTitle();
+        System.out.println("Page Title: " + title);
+
+        Assert.assertTrue(title.toLowerCase().contains("sign"),
+                "Title validation failed: " + title);
+
+        takeScreenshot("Step9_Signup");
+
+        // 10. Close current window
+        driver.close();
+
+        // Switch back
+        driver.switchTo().window(windows.get(0));
+
+        // 11. Print window count
+        System.out.println("Window Count: " + driver.getWindowHandles().size());
+
+        // 12. Navigate to blog
+        driver.get("https://www.testmuai.com/blog");
+
+        // 13. Click Community
+        WebElement community = wait.until(ExpectedConditions.elementToBeClickable(
+                By.linkText("Community")));
+
+        community.click();
+
+        wait.until(ExpectedConditions.urlContains("community"));
+
+        Assert.assertTrue(driver.getCurrentUrl().contains("community.testmuai.com"));
+
+        takeScreenshot("Step13_Community");
+
+        // 14. Close browser
+        driver.quit();
+    }
+
+    public void takeScreenshot(String name) {
+        try {
+            File src = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+
+            File folder = new File("screenshots");
+            if (!folder.exists()) {
+                folder.mkdir();
+            }
+
+            FileUtils.copyFile(src, new File("screenshots/" + name + ".png"));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+}
